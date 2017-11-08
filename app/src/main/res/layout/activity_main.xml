@@ -11,16 +11,11 @@
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
     </FrameLayout>
 
-    <!--<Button-->
-    <!--android:id="@+id/btn_switch_camera"-->
-    <!--android:text="switch camera"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"/>-->
     <RelativeLayout
+        android:gravity="center"
+        android:id="@+id/layout_switch_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:alpha="0.5"
@@ -29,11 +24,32 @@
         android:padding="9dp">
 
         <ImageButton
+
             android:id="@+id/img_btn_switch_flash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_flash_off"/>
+
+        <LinearLayout
+            android:layout_toLeftOf="@id/img_btn_switch_camera"
+            android:layout_toRightOf="@id/img_btn_switch_flash"
+            android:id="@+id/layout_brightness"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:gravity="center"
+                android:textColor="#fff"
+                android:text="Brightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <android.support.v7.widget.AppCompatSeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
 
         <ImageButton
             android:id="@+id/img_btn_switch_camera"
@@ -45,21 +61,28 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="26dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/layout_take_photo"
         android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
+
         <ImageButton
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
             android:id="@+id/img_btn_zoom_in"
-            android:src="@drawable/ic_flash_on"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_zoom_in"/>
+
         <ImageButton
+            android:background="@android:color/transparent"
             android:id="@+id/img_btn_zoom_out"
-            android:src="@drawable/ic_flash_off"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_zoom_out"/>
     </LinearLayout>
 
     <LinearLayout
@@ -74,9 +97,9 @@
         android:weightSum="10">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4">
+            android:layout_weight="3">
 
             <ImageView
                 android:id="@+id/img_lastest_thumnail"
@@ -85,17 +108,13 @@
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_launcher"/>
-
         </LinearLayout>
 
-        <SeekBar
-            android:id="@+id/seekBar2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="6">
+            android:layout_weight="4">
 
             <ImageButton
                 android:id="@+id/img_btn_take_photo"
@@ -105,6 +124,26 @@
                 android:src="@drawable/ic_take_photo"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+            <ImageButton
+                android:id="@+id/img_btn_timer"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/tv_timer"
+                android:layout_marginLeft="5dp"
+                android:textColor="#fff"
+                android:text="off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

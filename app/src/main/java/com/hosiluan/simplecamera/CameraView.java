@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.Policy;
+import java.security.acl.LastOwnerException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +35,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private Camera mCamera;
 
     public boolean isFlashOn;
+    private boolean isTimerOn = false;
+
     public Bitmap mLastestThumnailBitmap;
     private boolean hasFlash;
     Camera.Parameters params;
@@ -41,6 +44,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     private TakePhotoListener mTakePhotoListener;
 
+
+    public boolean isTimerOn() {
+        return isTimerOn;
+    }
+
+    public void setTimerOn(boolean timerOn) {
+        isTimerOn = timerOn;
+    }
 
     public boolean isFlashOn() {
         return isFlashOn;
@@ -325,7 +336,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                 currentZoomLevel+= 5;
                 params.setZoom(currentZoomLevel);
 //                params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);
-                params.setExposureCompensation(params.getMaxExposureCompensation());
                 mCamera.setParameters(params);
             }
         }
@@ -342,6 +352,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public void changeBrightness(int bright){
+        Log.d("Luan",bright + " brigh");
+
+        params = mCamera.getParameters();
+        params.setExposureCompensation(bright);
+        mCamera.setParameters(params);
+        mCamera.startPreview();
+    }
 
     public interface TakePhotoListener{
         void setBitmap(Bitmap bitmap);

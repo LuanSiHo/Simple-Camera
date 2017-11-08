@@ -1,9 +1,11 @@
 package com.hosiluan.simplecamera;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,22 +15,25 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class MainActivity extends BaseActivity implements CameraView.TakePhotoListener {
+public class MainActivity extends BaseActivity implements CameraView.TakePhotoListener, BaseActivity.PermissionAcceptedListener, BaseActivity.TakePictureListener {
 
     private Camera mCamera = null;
     private CameraView mCameraView = null;
 
     public ImageView mLastestThumnailImageView;
     private Button mSwitchCameraButton;
-    private ImageButton mSwitchCameraImageButton, mChangeFlashImageButton, mTakePhotoImageButton,
-            mZoomInImageButton, mZoomOutImageButton;
+    private ImageButton mSwitchCameraImageButton, mChangeFlashImageButton, mTakePhotoImageButton, mZoomInImageButton, mZoomOutImageButton, mTimerImageButton;
+    private TextView mTimerTextView;
     private int mCurrentCameraId = 0;
+    private SeekBar mSeekBar;
 
 
     @Override
@@ -46,35 +51,16 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     @Override
     protected void onResume() {
         super.onResume();
-        mCameraView.setListener(this);
-//        mLastestThumnailImageView.setImageResource(R.drawable.ic_flash_on);
-//
-//        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-//                Environment.DIRECTORY_PICTURES), "MyCameraApp");
-//
-//
-//        File file = new File(mediaStorageDir.getAbsolutePath() + File.separator +"IMG_20171108_144554.jpg");
-//        Log.d("Luan",file.getAbsolutePath()  + " path");
-//
-//        FileInputStream streamIn = null;
-//        try {
-//            streamIn = new FileInputStream(file);
-//        } catch (FileNotFoundException e) {
-//            Log.d("Luan","hello there");
-//            Log.d("Luan",e.toString());
-//            e.printStackTrace();
-//        }
-//
-//        Bitmap bitmap = BitmapFactory.decodeStream(streamIn);
-//        if (bitmap == null){
-//            Log.d("Luan","bitmap null");
-//        }else {
-//            Log.d("Luan","khac null");
-//        }
-//        bitmap = getScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight());
-//
-//        mLastestThumnailImageView.setImageBitmap(bitmap);
+        setPermissionListener(this);
+        setTakePictureListener(this);
+        mCamera = Camera.open();
 
+        if (mCamera != null) {
+            mCameraView = new CameraView(this, mCamera);
+            FrameLayout frameLayout = findViewById(R.id.camera_view);
+            frameLayout.addView(mCameraView);
+            mCameraView.setListener(this);
+        }
     }
 
     public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {
@@ -118,20 +104,14 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         mLastestThumnailImageView = findViewById(R.id.img_lastest_thumnail);
         mZoomOutImageButton = findViewById(R.id.img_btn_zoom_out);
         mZoomInImageButton = findViewById(R.id.img_btn_zoom_in);
+        mTimerImageButton = findViewById(R.id.img_btn_timer);
+        mTimerTextView = findViewById(R.id.tv_timer);
 
-
-        mCamera = Camera.open();
-
-        if (mCamera != null) {
-
-            mCameraView = new CameraView(this, mCamera);
-            FrameLayout frameLayout = findViewById(R.id.camera_view);
-            frameLayout.addView(mCameraView);
-        }
+        mSeekBar = findViewById(R.id.seek_bar);
+        mSeekBar.setProgress(50);
     }
 
     private void setEvent() {
-
 
         mSwitchCameraImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,7 +136,27 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         mTakePhotoImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCameraView.takePhoto();
+
+                if (mCameraView.isTimerOn()) {
+                    CountDownTimer countDownTimer = new CountDownTimer(3000, 1000) {
+                        @Override
+                        public void onTick(long l) {
+                            Log.d("Luan", "tick");
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            Log.d("Luan", "finish");
+                            Intent intent = new Intent();
+                            intent.setAction("com.luan.TAKE_PHOTO");
+                            sendBroadcast(intent);
+
+                        }
+                    };
+                    countDownTimer.start();
+                } else {
+                    mCameraView.takePhoto();
+                }
             }
         });
 
@@ -171,6 +171,43 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
             @Override
             public void onClick(View view) {
                 mCameraView.zoomOut();
+            }
+        });
+
+        mTimerImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mCameraView.isTimerOn()) {
+                    mTimerTextView.setText("off");
+                    mCameraView.setTimerOn(false);
+                } else {
+                    mTimerTextView.setText("on");
+                    mCameraView.setTimerOn(true);
+                }
+            }
+        });
+
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                Log.d("Luan", i + "");
+                if (i > 50) {
+                    mCameraView.changeBrightness(i / 10);
+                } else {
+                    mCameraView.changeBrightness(-10 + (i / 10));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Log.d("Luan", "start trackingtouch");
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.d("Luan", "stop trackingtouch");
+
             }
         });
     }
@@ -197,5 +234,25 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
             mLastestThumnailImageView.setImageBitmap(bitmap);
             mLastestThumnailImageView.setRotation(90);
         }
+    }
+
+    @Override
+    public void onCameraAccepted() {
+        mCamera = Camera.open();
+
+        if (mCamera != null) {
+
+            mCameraView = new CameraView(this, mCamera);
+            FrameLayout frameLayout = findViewById(R.id.camera_view);
+            frameLayout.addView(mCameraView);
+        }
+
+        mCameraView.setListener(this);
+
+    }
+
+    @Override
+    public void takephoto() {
+        mCameraView.takePhoto();
     }
 }
