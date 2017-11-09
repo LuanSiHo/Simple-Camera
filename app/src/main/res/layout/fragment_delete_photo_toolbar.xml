@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+
+        <TextView
+            android:textColor="#fff"
+            android:gravity="center"
+            android:text="Hủy"
+            android:id="@+id/tv_huy_delete_toolbar"
+            android:textSize="16sp"
+            android:layout_gravity="start"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+          />
+
+
+        <TextView
+            android:textColor="#fff"
+            android:gravity="center"
+            android:text="Xóa"
+            android:id="@+id/tv_xoa_delete_toolbar"
+            android:layout_marginRight="10dp"
+            android:textSize="16sp"
+            android:layout_gravity="end"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+</android.support.v7.widget.Toolbar>
