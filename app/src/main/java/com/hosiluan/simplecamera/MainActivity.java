@@ -1,12 +1,15 @@
 package com.hosiluan.simplecamera;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,13 +56,15 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         super.onResume();
         setPermissionListener(this);
         setTakePictureListener(this);
-        mCamera = Camera.open();
 
-        if (mCamera != null) {
-            mCameraView = new CameraView(this, mCamera);
-            FrameLayout frameLayout = findViewById(R.id.camera_view);
-            frameLayout.addView(mCameraView);
-            mCameraView.setListener(this);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            mCamera = Camera.open();
+            if (mCamera != null) {
+                mCameraView = new CameraView(this, mCamera);
+                FrameLayout frameLayout = findViewById(R.id.camera_view);
+                frameLayout.addView(mCameraView);
+                mCameraView.setListener(this);
+            }
         }
     }
 
@@ -112,6 +117,7 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     }
 
     private void setEvent() {
+
 
         mSwitchCameraImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
