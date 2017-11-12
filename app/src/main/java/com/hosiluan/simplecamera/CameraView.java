@@ -85,15 +85,16 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mHolder = getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
-        getmCamera();
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
         try {
-            mCamera.setPreviewDisplay(surfaceHolder);
-            mCamera.startPreview();
+            if (mCamera != null){
+                mCamera.setPreviewDisplay(surfaceHolder);
+                mCamera.startPreview();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,7 +122,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
         mCamera.stopPreview();
-        mCamera.release();
+//        mCamera.release();
     }
 
     public void switchCamera(int currentCameraId) {
@@ -136,16 +137,17 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
         mCamera = Camera.open(currentCameraId);
 
-        mCamera.setDisplayOrientation(90);
 
         try {
+            mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);
+            mCamera.startPreview();
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        mCamera.startPreview();
 
     }
 

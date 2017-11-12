@@ -38,7 +38,6 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
             Log.d("Luan","file == null");
         }else {
             Log.d("Luan","file != null");
-
         }
         new LoadImage().execute(file,this);
     }
@@ -59,17 +58,11 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
             try {
                 bitmap = BitmapFactory.decodeStream(new FileInputStream((File) objects[0]));
 
-                if (bitmap == null){
-                    Log.d("Luan","bitmap == null");
-                }else {
-                    Log.d("Luan","bitmap != null");
-
-                }
                 bitmap = getScaledBitmap(bitmap, ((ImageView) objects[1]).getWidth(),
                         ((ImageView) objects[1]).getHeight());
 
-//                Log.d("Luan",((ImageView) objects[1]).getWidth() + " / " +
-//                        ((ImageView) objects[1]).getHeight());
+                String path = saveToInternalStorage(bitmap,((File)objects[0]).getName());
+                Log.d("Luan",path );
 
                 publishProgress(((ImageView) objects[1]), bitmap);
 
@@ -81,11 +74,9 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
             return bitmap;
         }
 
-
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-
         }
     }
 
@@ -106,6 +97,28 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         return Bitmap.createScaledBitmap(b, nWidth, nHeight, true);
     }
 
+    private String saveToInternalStorage(Bitmap bitmapImage,String imageName){
+        ContextWrapper cw = new ContextWrapper(getContext());
 
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("tempImageDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File mypath=new File(directory,imageName);
 
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
+    }
 }

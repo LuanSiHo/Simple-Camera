@@ -84,7 +84,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
         Log.d("Luan",mListPhoto.get(position).getName());
-        holder.imageView.loadImage(mListPhoto.get(position));
+
+        ContextWrapper contextWrapper = new ContextWrapper(mContext);
+        File dir = contextWrapper.getDir("tempImageDir",Context.MODE_PRIVATE);
+
+        String path = dir.getAbsolutePath();
+        Log.d("Luan",path +  " path holer");
+
+        Bitmap bitmap = loadImageFromStorage(path,mListPhoto.get(position).getName());
+        if (bitmap != null){
+            Log.d("Luan","bitmap != null");
+            holder.imageView.setImageBitmap(bitmap);
+            holder.imageView.setRotation(90);
+        }else {
+            Log.d("Luan","bitmap == null");
+            holder.imageView.loadImage(mListPhoto.get(position));
+        }
 
         if (unHighLight){
             holder.itemView.setBackgroundColor(Color.WHITE);
@@ -158,6 +173,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
     }
+
+    /**
+     * load image from internal storage
+     */
+    private Bitmap loadImageFromStorage(String path, String imageName) {
+        Bitmap bitmap = null;
+        try {
+            File f = new File(path, imageName);
+            bitmap = BitmapFactory.decodeStream(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
 
     public interface RecyclerViewAdapterListener{
         void onItemClick(int position);

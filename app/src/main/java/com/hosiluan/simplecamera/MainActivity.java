@@ -50,12 +50,13 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         setView();
         setEvent();
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
 
-
-        ArrayList<File> files = getListFiles(mediaStorageDir);
-        Log.d("Luan",files.size() + " list size");
+//        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+//                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+//
+//
+//        ArrayList<File> files = getListFiles(mediaStorageDir);
+//        Log.d("Luan",files.size() + " list size");
 
 
     }
@@ -68,14 +69,18 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
+
             mCamera = Camera.open();
             if (mCamera != null) {
                 mCameraView = new CameraView(this, mCamera);
                 FrameLayout frameLayout = findViewById(R.id.camera_view);
                 frameLayout.addView(mCameraView);
                 mCameraView.setListener(this);
+                mCameraView.refreshCamera();
             }
         }
+
+
     }
 
     public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {
@@ -97,14 +102,18 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     @Override
     protected void onPause() {
         super.onPause();
-        // on pause turn off the flash
-//        turnOffFlash();
     }
 
 
     @Override
     protected void onStop() {
         super.onStop();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         // on stop release the camera
         if (mCamera != null) {
             mCamera.release();
@@ -128,6 +137,13 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     }
 
     private void setEvent() {
+
+        mLastestThumnailImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this,ListPhoToActivity.class));
+            }
+        });
 
         mSwitchCameraImageButton.setOnClickListener(new View.OnClickListener() {
             @Override

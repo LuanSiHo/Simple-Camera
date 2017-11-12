@@ -45,8 +45,6 @@ public class ListPhoToActivity extends BaseActivity
         mRecyclerViewAdapter = new RecyclerViewAdapter(mListPhoto, getApplicationContext(), this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-//                LinearLayoutManager.VERTICAL,false));
         mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
         File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "MyCameraApp");
