@@ -13,6 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 /**
  * Created by Ho Si Luan on 11/7/2017.
  */
@@ -108,6 +115,21 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+
+    protected ArrayList<File> getListFiles(File parentDir) {
+        ArrayList<File> inFiles = new ArrayList<>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inFiles.addAll(getListFiles(file));
+            } else {
+                if(file.getName().endsWith(".jpg")){
+                    inFiles.add(file);
+                }
+            }
+        }
+        return inFiles;
+    }
     public void setPermissionListener(PermissionAcceptedListener mPermissionAcceptedListener){
         this.mPermissionAcceptedListener = mPermissionAcceptedListener;
     }
