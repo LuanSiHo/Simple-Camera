@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:padding="5dp"
-    android:gravity="center"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="2.5dp"
+    android:gravity="center">
 
     <com.hosiluan.simplecamera.CustomImageView
-        android:scaleType="fitXY"
-        android:src="@mipmap/ic_launcher"
+        android:layout_gravity="center"
         android:id="@+id/img_image"
-        android:layout_width="170dp"
-        android:layout_height="170dp"/>
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_launcher"/>
 </LinearLayout>

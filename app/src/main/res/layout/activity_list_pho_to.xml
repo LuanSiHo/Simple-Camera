@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:context="com.hosiluan.simplecamera.ListPhoToActivity">
 
@@ -29,10 +29,10 @@
     <!--</GridView>-->
 
     <android.support.v7.widget.RecyclerView
-
+        android:layout_gravity="center_horizontal"
         android:id="@+id/recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
     </android.support.v7.widget.RecyclerView>
 </LinearLayout>

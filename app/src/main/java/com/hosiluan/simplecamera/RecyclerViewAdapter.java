@@ -42,6 +42,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private Boolean unHighLight = true;
 
 
+
+
     public ArrayList<File> getmSelectedList() {
         return mSelectedList;
     }

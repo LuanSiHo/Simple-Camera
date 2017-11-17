@@ -2,6 +2,7 @@ package com.hosiluan.simplecamera;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Environment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,7 +46,7 @@ public class ListPhoToActivity extends BaseActivity
         mRecyclerViewAdapter = new RecyclerViewAdapter(mListPhoto, getApplicationContext(), this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
         File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "MyCameraApp");
 
@@ -55,9 +56,20 @@ public class ListPhoToActivity extends BaseActivity
             mRecyclerViewAdapter.notifyDataSetChanged();
         }
 
-        Log.d("Luan", mListPhoto.size() + " sizee");
+    }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d("Luan","hello");
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Log.d("Luan", "ORIENTATION_LANDSCAPE");
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 6));
 
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
+            Log.d("Luan", "ORIENTATION_PORTRAIT");
+        }
     }
 
     public void setFragment(Fragment fragment, String TAG) {
