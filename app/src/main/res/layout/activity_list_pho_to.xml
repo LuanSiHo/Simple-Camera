@@ -19,14 +19,6 @@
 
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
-    <!--<GridView-->
-        <!--android:gravity="center"-->
-        <!--android:id="@+id/gridview_photo"-->
-        <!--android:numColumns="auto_fit"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
-
-    <!--</GridView>-->
 
     <android.support.v7.widget.RecyclerView
         android:layout_gravity="center_horizontal"

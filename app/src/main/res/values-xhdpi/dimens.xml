@@ -1,0 +1,4 @@
+<resources>
+	<dimen name="photo_size">260dp</dimen>
+	<dimen name="photo_padding">1dp</dimen>
+</resources>

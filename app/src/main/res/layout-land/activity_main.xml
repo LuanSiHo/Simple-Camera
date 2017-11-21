@@ -14,12 +14,13 @@
     </FrameLayout>
 
     <RelativeLayout
-        android:gravity="center"
+        android:layout_toLeftOf="@+id/layout_take_photo"
         android:id="@+id/layout_switch_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:alpha="0.5"
         android:background="#000"
+        android:gravity="center"
         android:orientation="horizontal"
         android:padding="9dp">
 
@@ -31,18 +32,21 @@
             android:src="@drawable/ic_flash_off"/>
 
         <LinearLayout
+
+            android:id="@+id/layout_brightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/img_btn_switch_camera"
             android:layout_toRightOf="@id/img_btn_switch_flash"
-            android:id="@+id/layout_brightness"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:orientation="vertical">
+
             <TextView
-                android:gravity="center"
-                android:textColor="#fff"
-                android:text="Brightness"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Brightness"
+                android:textColor="#fff"/>
+
             <android.support.v7.widget.AppCompatSeekBar
                 android:id="@+id/seek_bar"
                 android:layout_width="match_parent"
@@ -61,54 +65,88 @@
 
     <TextView
         android:id="@+id/textview_timer"
-        android:textColor="#fff"
-        android:gravity="center"
-        android:textSize="66sp"
-        android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:textColor="#fff"
+        android:textSize="66sp"/>
 
     <LinearLayout
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="26dp"
+        android:layout_toLeftOf="@+id/layout_take_photo"
+        android:layout_alignParentBottom="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/layout_take_photo"
-        android:layout_alignParentRight="true"
+        android:layout_marginBottom="26dp"
+        android:layout_marginRight="16dp"
         android:orientation="vertical">
 
         <ImageButton
-            android:layout_marginBottom="10dp"
-            android:background="@android:color/transparent"
             android:id="@+id/img_btn_zoom_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_zoom_in"/>
 
         <ImageButton
-            android:background="@android:color/transparent"
             android:id="@+id/img_btn_zoom_out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_zoom_out"/>
     </LinearLayout>
 
-
     <LinearLayout
-        android:id="@+id/layout_take_photo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#000"
-        android:gravity="center"
-        android:orientation="horizontal"
         android:padding="26dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/layout_take_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#000"
+        android:orientation="vertical"
         android:weightSum="10">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/img_btn_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_timer"/>
+
+            <TextView
+                android:id="@+id/tv_timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="off"
+                android:textColor="#fff"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/img_btn_take_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_take_photo"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="3">
 
             <ImageView
@@ -120,40 +158,6 @@
                 android:src="@mipmap/ic_launcher"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4">
-
-            <ImageButton
-                android:id="@+id/img_btn_take_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_take_photo"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_weight="3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent">
-            <ImageButton
-                android:id="@+id/img_btn_timer"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_timer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/tv_timer"
-                android:layout_marginLeft="5dp"
-                android:textColor="#fff"
-                android:text="off"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

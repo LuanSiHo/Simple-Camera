@@ -1,6 +1,7 @@
 package com.hosiluan.simplecamera;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,4 +43,18 @@ public class PhotoActivity extends BaseActivity {
     }
 
 
+    public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {
+        int bWidth = b.getWidth();
+        int bHeight = b.getHeight();
+
+        int nWidth = reqWidth;
+        int nHeight = reqHeight;
+
+        float parentRatio = (float) reqHeight / reqWidth;
+
+        nHeight = bHeight;
+        nWidth = (int) (reqWidth * parentRatio);
+
+        return Bitmap.createScaledBitmap(b, nWidth, nHeight, true);
+    }
 }

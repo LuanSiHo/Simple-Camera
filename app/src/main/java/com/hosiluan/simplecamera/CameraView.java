@@ -7,9 +7,11 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static android.content.Context.WINDOW_SERVICE;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
@@ -80,7 +83,25 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public CameraView(Context context, Camera camera) {
         super(context);
         mCamera = camera;
-        mCamera.setDisplayOrientation(90);
+
+        Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+
+        if (display.getRotation() == Surface.ROTATION_0) {
+            mCamera.setDisplayOrientation(90);
+        }
+
+        if (display.getRotation() == Surface.ROTATION_90) {
+            mCamera.setDisplayOrientation(0);
+        }
+
+        if (display.getRotation() == Surface.ROTATION_180) {
+            mCamera.setDisplayOrientation(270);
+        }
+
+        if (display.getRotation() == Surface.ROTATION_270) {
+            mCamera.setDisplayOrientation(180);
+        }
+
 
         mHolder = getHolder();
         mHolder.addCallback(this);
@@ -121,7 +142,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
-        mCamera.stopPreview();
+//        mCamera.stopPreview();
 //        mCamera.release();
     }
 
@@ -137,9 +158,26 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
         mCamera = Camera.open(currentCameraId);
 
+        Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+
+        if (display.getRotation() == Surface.ROTATION_0) {
+            mCamera.setDisplayOrientation(90);
+        }
+
+        if (display.getRotation() == Surface.ROTATION_90) {
+            mCamera.setDisplayOrientation(0);
+        }
+
+        if (display.getRotation() == Surface.ROTATION_180) {
+            mCamera.setDisplayOrientation(270);
+        }
+
+        if (display.getRotation() == Surface.ROTATION_270) {
+            mCamera.setDisplayOrientation(180);
+        }
 
         try {
-            mCamera.setDisplayOrientation(90);
+//            mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
@@ -163,6 +201,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public void takePhoto() {
 
         params = mCamera.getParameters();
+
 
         List<Camera.Size> sizes = params.getSupportedPictureSizes();
         Camera.Size size = sizes.get(0);

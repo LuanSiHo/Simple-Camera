@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.CornerPathEffect;
+import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -92,18 +94,20 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         float parentRatio = (float) reqHeight / reqWidth;
 
         nHeight = bHeight;
-        nWidth = (int) (reqWidth * 0.6);
+        nWidth = (int) (reqWidth * 0.8);
 
         return Bitmap.createScaledBitmap(b, nWidth, nHeight, true);
     }
 
-    private String saveToInternalStorage(Bitmap bitmapImage,String imageName){
+    private String saveToInternalStorage(Bitmap bitmapImage,String imageName) throws IOException {
         ContextWrapper cw = new ContextWrapper(getContext());
 
         // path to /data/data/yourapp/app_data/imageDir
         File directory = cw.getDir("tempImageDir", Context.MODE_PRIVATE);
         // Create imageDir
         File mypath=new File(directory,imageName);
+
+
 
         FileOutputStream fos = null;
         try {
