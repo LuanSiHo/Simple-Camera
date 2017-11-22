@@ -59,7 +59,6 @@ public class ListPhoToActivity extends BaseActivity
             mListPhoto.add(mPhotos.get(i));
             mRecyclerViewAdapter.notifyDataSetChanged();
         }
-
     }
 
     @Override
@@ -167,8 +166,6 @@ public class ListPhoToActivity extends BaseActivity
                 });
         alertDialog = builder.create();
         alertDialog.show();
-
-
 
     }
 }

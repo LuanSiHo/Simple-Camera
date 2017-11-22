@@ -5,17 +5,25 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.CornerPathEffect;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
+import android.view.WindowManager;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 /**
  * Created by User on 11/9/2017.
@@ -36,11 +44,7 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
 
     public void loadImage(File file) {
 
-        if (file == null){
-            Log.d("Luan","file == null");
-        }else {
-            Log.d("Luan","file != null");
-        }
+//        Picasso.with(getContext()).load(file).into(this);
         new LoadImage().execute(file,this);
     }
 
@@ -51,7 +55,9 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         protected void onProgressUpdate(Object... values) {
             super.onProgressUpdate(values);
             ((ImageView) values[0]).setImageBitmap((Bitmap) values[1]);
-            ((ImageView) values[0]).setRotation(90);
+
+
+//            ((ImageView) values[0]).setRotation(90);
         }
 
         @Override
@@ -63,8 +69,26 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
                 bitmap = getScaledBitmap(bitmap, ((ImageView) objects[1]).getWidth(),
                         ((ImageView) objects[1]).getHeight());
 
-                String path = saveToInternalStorage(bitmap,((File)objects[0]).getName());
-                Log.d("Luan",path );
+                Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+                Matrix matrix = new Matrix();
+
+                switch (display.getRotation()) {
+                    case Surface.ROTATION_0:
+                        matrix.postRotate(90);
+                        break;
+                    case Surface.ROTATION_90:
+                        matrix.postRotate(0);
+                        break;
+                    case Surface.ROTATION_180:
+                        matrix.postRotate(270);
+                        break;
+                    case Surface.ROTATION_270:
+                        matrix.postRotate(180);
+                        break;
+                }
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                String path = saveToInternalStorage(bitmap, ((File) objects[0]).getName());
 
                 publishProgress(((ImageView) objects[1]), bitmap);
 
@@ -80,6 +104,14 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
         }
+    }
+
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
     public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {
@@ -99,14 +131,13 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         return Bitmap.createScaledBitmap(b, nWidth, nHeight, true);
     }
 
-    private String saveToInternalStorage(Bitmap bitmapImage,String imageName) throws IOException {
+    private String saveToInternalStorage(Bitmap bitmapImage, String imageName) throws IOException {
         ContextWrapper cw = new ContextWrapper(getContext());
 
         // path to /data/data/yourapp/app_data/imageDir
         File directory = cw.getDir("tempImageDir", Context.MODE_PRIVATE);
         // Create imageDir
-        File mypath=new File(directory,imageName);
-
+        File mypath = new File(directory, imageName);
 
 
         FileOutputStream fos = null;

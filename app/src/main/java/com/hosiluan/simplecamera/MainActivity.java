@@ -67,31 +67,23 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         setView();
         setEvent();
 
-//        ExifInterface exifInterface = null;
-//
-//
-//        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-//                "MyCameraApp");
-//        File mypath=new File(imageDir,"IMG_20171121_133351_HDR.jpg");
-//        Log.d("Luan",mypath.getPath() + " path");
-//
-//        try {
-//            exifInterface = new ExifInterface(mypath.getPath());
-//            ShowExif(exifInterface);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        int rotation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-//        int rotationInDegrees = exifToDegrees(rotation);
-//        Log.d("Luan",rotationInDegrees + " rotation");
+        ExifInterface exifInterface = null;
 
-//        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-//                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "MyCameraApp");
+        File mypath=new File(imageDir,"IMG_20171122_153638.jpg");
+        Log.d("Luan",mypath.getPath() + " path");
+
+        try {
+            exifInterface = new ExifInterface(mypath.getPath());
+            ShowExif(exifInterface);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 //
-//
-//        ArrayList<File> files = getListFiles(mediaStorageDir);
-//        Log.d("Luan",files.size() + " list size");
+        int rotation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        Log.d("Luan",rotation + " rotation");
+
     }
 
     private void ShowExif(ExifInterface exif)
@@ -333,37 +325,8 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     public void setBitmap(Bitmap bitmap) {
 
         if (bitmap != null) {
-            bitmap = getScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight());
+//            bitmap = getScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight());
             mLastestThumnailImageView.setImageBitmap(bitmap);
-
-            Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-            if (display.getRotation() == Surface.ROTATION_0) {
-                if(mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
-                    mLastestThumnailImageView.setRotation(90);
-                }else {
-                    mLastestThumnailImageView.setRotation(270);
-                }
-            }
-
-            if (display.getRotation() == Surface.ROTATION_90) {
-                if(mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
-                    mLastestThumnailImageView.setRotation(0);
-
-                }else {
-                    mLastestThumnailImageView.setRotation(180);
-                }
-            }
-
-            if (display.getRotation() == Surface.ROTATION_180) {
-                if(mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
-                    mLastestThumnailImageView.setRotation(270);
-                }
-            }
-
-            if (display.getRotation() == Surface.ROTATION_270) {
-
-                mLastestThumnailImageView.setRotation(180);
-            }
         }
     }
 

@@ -95,11 +95,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         Bitmap bitmap = loadImageFromStorage(path,mListPhoto.get(position).getName());
         if (bitmap != null){
-            Log.d("Luan","bitmap != null");
             holder.imageView.setImageBitmap(bitmap);
-            holder.imageView.setRotation(90);
+
         }else {
-            Log.d("Luan","bitmap == null");
             holder.imageView.loadImage(mListPhoto.get(position));
         }
 
@@ -124,11 +122,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     }
                 }else {
                     recyclerViewAdapterListener.onItemClick(position);
-
                 }
             }
         });
-
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

@@ -144,5 +144,4 @@ public class BaseActivity extends AppCompatActivity {
     public interface TakePictureListener {
         void takephoto();
     }
-
 }

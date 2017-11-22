@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Environment;
 import android.util.Log;
@@ -112,7 +113,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
         try {
-            if (mCamera != null){
+            if (mCamera != null) {
                 mCamera.setPreviewDisplay(surfaceHolder);
                 mCamera.startPreview();
             }
@@ -236,7 +237,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     // Turning On flash
     private void turnOnFlash() {
-        if (mCamera == null){
+        if (mCamera == null) {
             return;
         }
 
@@ -296,6 +297,31 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                 File file = new File(path);
                 Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(pictureFile));
 
+
+                Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+                Matrix matrix = new Matrix();
+
+                switch (display.getRotation()) {
+                    case Surface.ROTATION_0:
+                        matrix.postRotate(90);
+                        Log.d("Luan","0");
+                        break;
+                    case Surface.ROTATION_90:
+                        matrix.postRotate(0);
+                        Log.d("Luan","90");
+                        break;
+                    case Surface.ROTATION_180:
+                        matrix.postRotate(0);
+                        Log.d("Luan","270");
+                        break;
+                    case Surface.ROTATION_270:
+                        matrix.postRotate(180);
+                        Log.d("Luan","180");
+                        break;
+                }
+
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
                 mTakePhotoListener.setBitmap(bitmap);
 
 
@@ -306,7 +332,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             refreshCamera();
-
         }
     };
 
@@ -368,13 +393,13 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-    public void zoomIn(){
-        params= mCamera.getParameters();
-        if (params.isZoomSupported()){
+    public void zoomIn() {
+        params = mCamera.getParameters();
+        if (params.isZoomSupported()) {
             int maxZoomLevel = params.getMaxZoom();
-            Log.d("Luan","max zoom level " + maxZoomLevel);
-            if (currentZoomLevel < maxZoomLevel-5){
-                currentZoomLevel+= 5;
+            Log.d("Luan", "max zoom level " + maxZoomLevel);
+            if (currentZoomLevel < maxZoomLevel - 5) {
+                currentZoomLevel += 5;
                 params.setZoom(currentZoomLevel);
 //                params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_CLOUDY_DAYLIGHT);
                 mCamera.setParameters(params);
@@ -382,10 +407,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void zoomOut(){
-        params= mCamera.getParameters();
+    public void zoomOut() {
+        params = mCamera.getParameters();
         if (params.isZoomSupported()) {
-            if (currentZoomLevel >= 5){
+            if (currentZoomLevel >= 5) {
                 currentZoomLevel -= 5;
                 params.setZoom(currentZoomLevel);
                 mCamera.setParameters(params);
@@ -393,8 +418,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void changeBrightness(int bright){
-        Log.d("Luan",bright + " brigh");
+    public void changeBrightness(int bright) {
+        Log.d("Luan", bright + " brigh");
 
         params = mCamera.getParameters();
         params.setExposureCompensation(bright);
@@ -402,11 +427,11 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mCamera.startPreview();
     }
 
-    public interface TakePhotoListener{
+    public interface TakePhotoListener {
         void setBitmap(Bitmap bitmap);
     }
 
-    public void setListener(TakePhotoListener mTakePhotoListener){
+    public void setListener(TakePhotoListener mTakePhotoListener) {
         this.mTakePhotoListener = mTakePhotoListener;
     }
 }
