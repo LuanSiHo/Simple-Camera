@@ -1,11 +1,8 @@
 package com.hosiluan.simplecamera;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.media.ExifInterface;
@@ -13,30 +10,20 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hosiluan.simplecamera.general.Common;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends BaseActivity implements CameraView.TakePhotoListener,
         BaseActivity.PermissionAcceptedListener, BaseActivity.TakePictureListener {
@@ -51,9 +38,8 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
             mTakePhotoImageButton, mZoomInImageButton, mZoomOutImageButton, mTimerImageButton;
     private TextView mTimerStatusTextView, mTimerTextView;
     private int mCurrentCameraId = 0;
-    private int mSaveCameraId = -1;
+    public static int sSavedCameraId = -1;
     private SeekBar mSeekBar;
-
 
 
     @Override
@@ -67,28 +53,25 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         setView();
         setEvent();
 
-        ExifInterface exifInterface = null;
-
-        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "MyCameraApp");
-        File mypath=new File(imageDir,"IMG_20171122_153638.jpg");
-        Log.d("Luan",mypath.getPath() + " path");
-
-        try {
-            exifInterface = new ExifInterface(mypath.getPath());
-            ShowExif(exifInterface);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        ExifInterface exifInterface = null;
 //
-        int rotation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        Log.d("Luan",rotation + " rotation");
+//        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+//                "MyCameraApp");
+//        File mypath = new File(imageDir, "IMG_20171122_153638.jpg");
+//
+//        try {
+//            exifInterface = new ExifInterface(mypath.getPath());
+//            ShowExif(exifInterface);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+////
+//        int rotation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 
     }
 
-    private void ShowExif(ExifInterface exif)
-    {
-        String myAttribute="Exif information ---\n";
+    private void ShowExif(ExifInterface exif) {
+        String myAttribute = "Exif information ---\n";
         myAttribute += getTagString(ExifInterface.TAG_DATETIME, exif);
         myAttribute += getTagString(ExifInterface.TAG_FLASH, exif);
         myAttribute += getTagString(ExifInterface.TAG_GPS_LATITUDE, exif);
@@ -101,18 +84,22 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         myAttribute += getTagString(ExifInterface.TAG_MODEL, exif);
         myAttribute += getTagString(ExifInterface.TAG_ORIENTATION, exif);
         myAttribute += getTagString(ExifInterface.TAG_WHITE_BALANCE, exif);
-        Log.d("Luan",myAttribute);
+        Log.d("Luan", myAttribute);
 //        myTextView.setText(myAttribute);
     }
-    private String getTagString(String tag, ExifInterface exif)
-    {
-        return(tag + " : " + exif.getAttribute(tag) + "\n");
+
+    private String getTagString(String tag, ExifInterface exif) {
+        return (tag + " : " + exif.getAttribute(tag) + "\n");
     }
 
     private static int exifToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
         return 0;
     }
 
@@ -122,22 +109,44 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         setPermissionListener(this);
         setTakePictureListener(this);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+        }
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
 
-            if (mSaveCameraId >= 0 ){
-                mCamera = Camera.open(mSaveCameraId);
-            }else {
+            if (sSavedCameraId >= 0) {
+                mCamera = Camera.open(sSavedCameraId);
+            } else {
                 mCamera = Camera.open();
             }
+
             if (mCamera != null) {
                 mCameraView = new CameraView(this, mCamera);
                 FrameLayout frameLayout = findViewById(R.id.camera_view);
                 frameLayout.addView(mCameraView);
                 mCameraView.setListener(this);
                 mCameraView.refreshCamera();
+
             }
         }
+
+
+// else {
+//            if (sSavedCameraId >= 0) {
+//                mCamera = Camera.open(sSavedCameraId);
+//            } else {
+//                mCamera = Camera.open();
+//            }
+//            if (mCamera != null) {
+//                mCameraView = new CameraView(this, mCamera);
+//                FrameLayout frameLayout = findViewById(R.id.camera_view);
+//                frameLayout.addView(mCameraView);
+//                mCameraView.setListener(this);
+//                mCameraView.refreshCamera();
+//            }
+//        }
     }
 
     public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {
@@ -165,7 +174,6 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     @Override
     protected void onStop() {
         super.onStop();
-
     }
 
     @Override
@@ -209,10 +217,10 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
                 mCameraView.switchCamera(mCurrentCameraId);
                 if (mCurrentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
                     mCurrentCameraId = 1;
-                    mSaveCameraId = 1;
+                    sSavedCameraId = 1;
                 } else {
                     mCurrentCameraId = 0;
-                    mSaveCameraId = 0;
+                    sSavedCameraId = 0;
                 }
             }
         });
@@ -352,16 +360,16 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mSaveCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            outState.putInt(Common.CURRENT_CAMERA_ID,0);
-        } else if (mSaveCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT){
-            outState.putInt(Common.CURRENT_CAMERA_ID,1);
+        if (sSavedCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            outState.putInt(Common.CURRENT_CAMERA_ID, 0);
+        } else if (sSavedCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            outState.putInt(Common.CURRENT_CAMERA_ID, 1);
         }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mSaveCameraId = savedInstanceState.getInt(Common.CURRENT_CAMERA_ID);
+        sSavedCameraId = savedInstanceState.getInt(Common.CURRENT_CAMERA_ID);
     }
 }

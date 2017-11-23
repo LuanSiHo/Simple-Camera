@@ -43,7 +43,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
 
-
     public ArrayList<File> getmSelectedList() {
         return mSelectedList;
     }
@@ -85,23 +84,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
-        Log.d("Luan",mListPhoto.get(position).getName());
+        CachingBitmap cachingBitmap = CachingBitmap.getInstance();
+        Bitmap bitmap = cachingBitmap.getBitmapFromMemCache(mListPhoto.get(position).getName());
 
-        ContextWrapper contextWrapper = new ContextWrapper(mContext);
-        File dir = contextWrapper.getDir("tempImageDir",Context.MODE_PRIVATE);
-
-        String path = dir.getAbsolutePath();
-        Log.d("Luan",path +  " path holer");
-
-        Bitmap bitmap = loadImageFromStorage(path,mListPhoto.get(position).getName());
         if (bitmap != null){
             holder.imageView.setImageBitmap(bitmap);
-
         }else {
             holder.imageView.loadImage(mListPhoto.get(position));
         }
 
-        if (unHighLight){
+        if (unHighLight) {
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
 
@@ -109,18 +101,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public void onClick(View view) {
 
-                if (isLongClicked){
-                    if (checkHighlightPositon(position)){
-                            view.setBackgroundColor(Color.WHITE);
-                            mSelectedList.remove(mListPhoto.get(position));
-                            highlightPosition.remove(String.valueOf(position));
-
-                    }else {
-                            view.setBackgroundColor(Color.BLUE);
-                            mSelectedList.add(mListPhoto.get(position));
-                            highlightPosition.add(String.valueOf(position));
+                if (isLongClicked) {
+                    if (checkHighlightPositon(position)) {
+                        view.setBackgroundColor(Color.WHITE);
+                        mSelectedList.remove(mListPhoto.get(position));
+                        highlightPosition.remove(String.valueOf(position));
+                    } else {
+                        view.setBackgroundColor(Color.BLUE);
+                        mSelectedList.add(mListPhoto.get(position));
+                        highlightPosition.add(String.valueOf(position));
                     }
-                }else {
+                } else {
                     recyclerViewAdapterListener.onItemClick(position);
                 }
             }
@@ -161,15 +152,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         return false;
     }
+
     public void removeAllSelectedItem() {
         for (int i = 0; i < mSelectedList.size(); i++) {
             mSelectedList.remove(i);
-
         }
         for (int i = 0; i < highlightPosition.size(); i++) {
             highlightPosition.remove(i);
         }
-
     }
 
     /**
@@ -187,8 +177,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
 
-    public interface RecyclerViewAdapterListener{
+    public interface RecyclerViewAdapterListener {
         void onItemClick(int position);
+
         void onItemLongClick();
     }
 }

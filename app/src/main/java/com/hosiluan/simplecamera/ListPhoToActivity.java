@@ -24,7 +24,6 @@ public class ListPhoToActivity extends BaseActivity
 
     ArrayList<File> mListPhoto;
     GridView mListPhotoGridView;
-    CustomGridAdapter mCustomGridAdapter;
 
     RecyclerView mRecyclerView;
     RecyclerViewAdapter mRecyclerViewAdapter;
@@ -37,6 +36,7 @@ public class ListPhoToActivity extends BaseActivity
         setView();
         setEvent();
         initToolbar();
+        Log.d("hello","ahihi");
     }
 
     private void setView() {
@@ -64,14 +64,12 @@ public class ListPhoToActivity extends BaseActivity
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.d("Luan","hello");
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Log.d("Luan", "ORIENTATION_LANDSCAPE");
+
             mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 5));
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
-            Log.d("Luan", "ORIENTATION_PORTRAIT");
         }
     }
 
@@ -146,7 +144,6 @@ public class ListPhoToActivity extends BaseActivity
 
 
                         ArrayList<File> files = mRecyclerViewAdapter.getmSelectedList();
-                        Log.d("Luan",files.size() + " size");
                         for (int j = 0; j < files.size(); j ++){
                             files.get(j).delete();
                         }

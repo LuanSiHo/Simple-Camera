@@ -6,19 +6,24 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.media.ExifInterface;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.Policy;
 import java.security.acl.LastOwnerException;
 import java.text.SimpleDateFormat;
@@ -26,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import static android.content.Context.WINDOW_SERVICE;
+import static android.hardware.Camera.*;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
@@ -47,6 +53,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     int currentZoomLevel = 1;
 
     private TakePhotoListener mTakePhotoListener;
+    private Camera.Size mPreviewSize;
+    private List<Camera.Size> mSupportedPreviewSizes;
 
 
     public boolean isTimerOn() {
@@ -83,10 +91,22 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     public CameraView(Context context, Camera camera) {
         super(context);
+
+//        if (mCamera != null && mCamera != camera){
+//            mCamera.stopPreview();
+//            mCamera.release();
+//            mCamera = null;
+//        }
+
         mCamera = camera;
 
-        Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+        // supported preview sizes
+//        mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
 
+//        requestLayout();
+
+
+        Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         if (display.getRotation() == Surface.ROTATION_0) {
             mCamera.setDisplayOrientation(90);
         }
@@ -103,15 +123,82 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             mCamera.setDisplayOrientation(180);
         }
 
-
         mHolder = getHolder();
         mHolder.addCallback(this);
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
+        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//        mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
+
+//        try {
+//            mCamera.setPreviewDisplay(mHolder);
+//            mCamera.startPreview();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
+
+//    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+//        final double ASPECT_TOLERANCE = 1;
+//        double targetRatio = (double) h / w;
+//
+//        if (sizes == null)
+//            return null;
+//
+//        Camera.Size optimalSize = null;
+//        double minDiff = Double.MAX_VALUE;
+//
+//        int targetHeight = h;
+//
+//        for (Camera.Size size : sizes) {
+//            double ratio = (double) size.height / size.width;
+//            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+//                continue;
+//
+//            if (Math.abs(size.height - targetHeight) < minDiff) {
+//                optimalSize = size;
+//                minDiff = Math.abs(size.height - targetHeight);
+//            }
+//        }
+//
+//        if (optimalSize == null) {
+//            minDiff = Double.MAX_VALUE;
+//            for (Camera.Size size : sizes) {
+//                if (Math.abs(size.height - targetHeight) < minDiff) {
+//                    optimalSize = size;
+//                    minDiff = Math.abs(size.height - targetHeight);
+//                }
+//            }
+//        }
+//        return optimalSize;
+//    }
+//
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+//        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+//
+//        if (mSupportedPreviewSizes != null) {
+//            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+//        }
+//
+//        if (mPreviewSize!=null) {
+//            float ratio;
+//            if(mPreviewSize.height >= mPreviewSize.width)
+//                ratio = (float) mPreviewSize.height / (float) mPreviewSize.width;
+//            else
+//                ratio = (float) mPreviewSize.width / (float) mPreviewSize.height;
+//
+//            // One of these methods should be used, second method squishes preview slightly
+//            setMeasuredDimension(width, (int) (width * ratio));
+//            //        setMeasuredDimension((int) (width * ratio), height);
+//        }
+//    }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
+        Log.d("Luan","surface create");
         try {
             if (mCamera != null) {
                 mCamera.setPreviewDisplay(surfaceHolder);
@@ -120,28 +207,59 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+//        try {
+////            mCamera.setPreviewDisplay(mHolder);
+////            mCamera.startPreview();
+//
+////            mCamera.stopPreview();
+//
+//            if (mCamera != null){
+////                Camera.Parameters parameters =  mCamera.getParameters();
+////                parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+////                mCamera.setParameters(parameters);
+//                mCamera.setPreviewDisplay(mHolder);
+//                mCamera.startPreview();
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+        Log.d("Luan","surface change");
 
-        if (mHolder.getSurface() == null) {
+        if (mHolder.getSurface() == null){
+            // preview surface does not exist
             return;
         }
 
-        mCamera.stopPreview();
+        // stop preview before making changes
+        try {
+            mCamera.stopPreview();
+        } catch (Exception e){
+            // ignore: tried to stop a non-existent preview
+        }
 
+        // set preview size and make any resize, rotate or
+        // reformatting changes here
+
+        // start preview with new settings
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e){
         }
+
+
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        Log.d("Luan","surface destroy");
 
 //        mCamera.stopPreview();
 //        mCamera.release();
@@ -152,12 +270,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mCamera.release();
 
         //swap the id of the camera to be used
-        if (currentCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            currentCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+        if (currentCameraId == CameraInfo.CAMERA_FACING_BACK) {
+            currentCameraId = CameraInfo.CAMERA_FACING_FRONT;
         } else {
-            currentCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+            currentCameraId = CameraInfo.CAMERA_FACING_BACK;
         }
-        mCamera = Camera.open(currentCameraId);
+        mCamera = open(currentCameraId);
 
         Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
 
@@ -203,7 +321,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
         params = mCamera.getParameters();
 
-
         List<Camera.Size> sizes = params.getSupportedPictureSizes();
         Camera.Size size = sizes.get(0);
         for (int i = 0; i < sizes.size(); i++) {
@@ -227,7 +344,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private void getCamera() {
         if (mCamera == null) {
             try {
-                mCamera = Camera.open();
+                mCamera = open();
                 params = mCamera.getParameters();
             } catch (RuntimeException e) {
                 Log.e("Luan", e.getMessage());
@@ -258,7 +375,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-    Camera.ShutterCallback myShutterCallback = new Camera.ShutterCallback() {
+    ShutterCallback myShutterCallback = new ShutterCallback() {
 
         @Override
         public void onShutter() {
@@ -267,7 +384,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     };
 
-    Camera.PictureCallback myPictureCallback_RAW = new Camera.PictureCallback() {
+    PictureCallback myPictureCallback_RAW = new PictureCallback() {
 
         @Override
         public void onPictureTaken(byte[] arg0, Camera arg1) {
@@ -276,7 +393,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     };
 
-    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+    private PictureCallback mPicture = new PictureCallback() {
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -289,52 +406,70 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             String path = pictureFile.getAbsolutePath();
 
             try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
 
-
-                File file = new File(path);
-                Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(pictureFile));
-
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
                 Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
                 Matrix matrix = new Matrix();
 
+                Log.d("Luan",MainActivity.sSavedCameraId + " save id");
                 switch (display.getRotation()) {
                     case Surface.ROTATION_0:
-                        matrix.postRotate(90);
-                        Log.d("Luan","0");
+                        if (MainActivity.sSavedCameraId == 1) {
+                            matrix.postRotate(270);
+                        } else {
+                            matrix.postRotate(90);
+                        }
                         break;
                     case Surface.ROTATION_90:
                         matrix.postRotate(0);
-                        Log.d("Luan","90");
                         break;
                     case Surface.ROTATION_180:
-                        matrix.postRotate(0);
-                        Log.d("Luan","270");
+                        matrix.postRotate(270);
                         break;
                     case Surface.ROTATION_270:
                         matrix.postRotate(180);
-                        Log.d("Luan","180");
                         break;
                 }
+                bitmap = resize(bitmap,bitmap.getWidth(),bitmap.getHeight());
 
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+//                bitmap = getScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight());
+
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
 
                 mTakePhotoListener.setBitmap(bitmap);
 
-
             } catch (FileNotFoundException e) {
                 Log.d("Luan", "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d("Luan", "Error accessing file: " + e.getMessage());
             }
 
             refreshCamera();
         }
     };
 
+    private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
+        if (maxHeight > 0 && maxWidth > 0) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            float ratioBitmap = (float) width / (float) height;
+            float ratioMax = (float) maxWidth / (float) maxHeight;
+
+            int finalWidth = maxWidth;
+            int finalHeight = maxHeight;
+            if (ratioMax > ratioBitmap) {
+                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+            } else {
+                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+            }
+            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            return image;
+        } else {
+            return image;
+        }
+    }
     public void refreshCamera() {
         if (mHolder.getSurface() == null) {
             // preview surface does not exist
@@ -427,6 +562,24 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         mCamera.startPreview();
     }
 
+
+    public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {
+
+
+        int bWidth = b.getWidth();
+        int bHeight = b.getHeight();
+
+        int nWidth = reqWidth;
+        int nHeight = reqHeight;
+
+        float parentRatio = (float) reqHeight / reqWidth;
+
+        nHeight = bHeight;
+        nWidth = (int) (reqWidth * 0.8);
+
+        return Bitmap.createScaledBitmap(b, nWidth, nHeight, true);
+    }
+
     public interface TakePhotoListener {
         void setBitmap(Bitmap bitmap);
     }
@@ -434,4 +587,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public void setListener(TakePhotoListener mTakePhotoListener) {
         this.mTakePhotoListener = mTakePhotoListener;
     }
+
+
 }

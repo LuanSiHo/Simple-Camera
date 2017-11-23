@@ -43,8 +43,6 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
     }
 
     public void loadImage(File file) {
-
-//        Picasso.with(getContext()).load(file).into(this);
         new LoadImage().execute(file,this);
     }
 
@@ -55,9 +53,6 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         protected void onProgressUpdate(Object... values) {
             super.onProgressUpdate(values);
             ((ImageView) values[0]).setImageBitmap((Bitmap) values[1]);
-
-
-//            ((ImageView) values[0]).setRotation(90);
         }
 
         @Override
@@ -66,35 +61,18 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
             try {
                 bitmap = BitmapFactory.decodeStream(new FileInputStream((File) objects[0]));
 
-                bitmap = getScaledBitmap(bitmap, ((ImageView) objects[1]).getWidth(),
+//                bitmap = getScaledBitmap(bitmap, ((ImageView) objects[1]).getWidth(),
+//                        ((ImageView) objects[1]).getHeight());
+
+                bitmap = resize(bitmap, ((ImageView) objects[1]).getWidth(),
                         ((ImageView) objects[1]).getHeight());
 
-                Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-                Matrix matrix = new Matrix();
-
-                switch (display.getRotation()) {
-                    case Surface.ROTATION_0:
-                        matrix.postRotate(90);
-                        break;
-                    case Surface.ROTATION_90:
-                        matrix.postRotate(0);
-                        break;
-                    case Surface.ROTATION_180:
-                        matrix.postRotate(270);
-                        break;
-                    case Surface.ROTATION_270:
-                        matrix.postRotate(180);
-                        break;
-                }
-
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                String path = saveToInternalStorage(bitmap, ((File) objects[0]).getName());
+                CachingBitmap cachingBitmap = CachingBitmap.getInstance();
+                cachingBitmap.addBitmapToMemoryCache(((File) objects[0]).getName(),bitmap);
 
                 publishProgress(((ImageView) objects[1]), bitmap);
 
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
                 e.printStackTrace();
             }
             return bitmap;
@@ -112,6 +90,27 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
+    }
+
+    private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
+        if (maxHeight > 0 && maxWidth > 0) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            float ratioBitmap = (float) width / (float) height;
+            float ratioMax = (float) maxWidth / (float) maxHeight;
+
+            int finalWidth = maxWidth;
+            int finalHeight = maxHeight;
+            if (ratioMax > ratioBitmap) {
+                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+            } else {
+                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+            }
+            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            return image;
+        } else {
+            return image;
+        }
     }
 
     public static Bitmap getScaledBitmap(Bitmap b, int reqWidth, int reqHeight) {

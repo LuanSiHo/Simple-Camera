@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,7 +23,7 @@ public class PhotoActivity extends BaseActivity {
 
 
     private CustomImageView mImageView;
-    private LinearLayout mLinearLayoutPhoto;
+    private RelativeLayout mLinearLayoutPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,42 +84,11 @@ public class PhotoActivity extends BaseActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-//        if (newConfig.orientation == newConfig.ORIENTATION_LANDSCAPE){
-//
-//            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-//                    FrameLayout.LayoutParams.MATCH_PARENT,
-//                    FrameLayout.LayoutParams.MATCH_PARENT);
-//            layoutParams.gravity = Gravity.CENTER;
-//            layoutParams.height = (int) getScreenHeight();
-//            double h = getScreenHeight();
-//            double w = getScreenWidth();
-//
-//            double mAppRatio = w > h ? w / h : h / w;
-//
-//            layoutParams.width = (int) (getScreenHeight() / mAppRatio);
-//            mLinearLayoutPhoto.setLayoutParams(layoutParams);
-//
-//
-//        }else if (newConfig.orientation == newConfig.ORIENTATION_PORTRAIT){
-//            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-//                    FrameLayout.LayoutParams.MATCH_PARENT,
-//                    FrameLayout.LayoutParams.MATCH_PARENT);
-//            layoutParams.gravity = Gravity.CENTER;
-//            layoutParams.width = (int) getScreenWidth();
-//            double h = getScreenHeight();
-//            double w = getScreenWidth();
-//            double mAppRatio = w > h ? w / h : h / w;
-//
-//            layoutParams.height = (int) (getScreenWidth() / mAppRatio);
-//            mLinearLayoutPhoto.setLayoutParams(layoutParams);
-//        }
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
 
-
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
-
-        layoutParams.gravity = Gravity.CENTER;
+//        layoutParams.gravity = Gravity.CENTER;
         double h = getScreenHeight();
         double w = getScreenWidth();
 
@@ -125,7 +97,6 @@ public class PhotoActivity extends BaseActivity {
         layoutParams.height = (int) getScreenHeight();
         layoutParams.width = (int) (getScreenHeight() / mAppRatio);
 
-        mLinearLayoutPhoto.setLayoutParams(layoutParams);
-
+        mImageView.setLayoutParams(layoutParams);
     }
 }
