@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -26,7 +28,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class MainActivity extends BaseActivity implements CameraView.TakePhotoListener,
-        BaseActivity.PermissionAcceptedListener, BaseActivity.TakePictureListener {
+        BaseActivity.PermissionAcceptedListener, BaseActivity.TakePictureListener{
 
     private Camera mCamera = null;
     private CameraView mCameraView = null;
@@ -46,28 +48,10 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        checkCameraPermision();
-        checkReadtoragePermision();
-        checkWriteStoragePermision();
 
+        checkPermission();
         setView();
         setEvent();
-
-//        ExifInterface exifInterface = null;
-//
-//        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-//                "MyCameraApp");
-//        File mypath = new File(imageDir, "IMG_20171122_153638.jpg");
-//
-//        try {
-//            exifInterface = new ExifInterface(mypath.getPath());
-//            ShowExif(exifInterface);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-////
-//        int rotation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
     }
 
     private void ShowExif(ExifInterface exif) {
@@ -131,8 +115,6 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
 
             }
         }
-
-
 // else {
 //            if (sSavedCameraId >= 0) {
 //                mCamera = Camera.open(sSavedCameraId);
@@ -372,4 +354,5 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         super.onRestoreInstanceState(savedInstanceState);
         sSavedCameraId = savedInstanceState.getInt(Common.CURRENT_CAMERA_ID);
     }
+
 }

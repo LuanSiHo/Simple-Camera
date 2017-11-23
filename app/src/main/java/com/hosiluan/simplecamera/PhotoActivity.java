@@ -5,10 +5,15 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,11 +30,15 @@ public class PhotoActivity extends BaseActivity {
     private CustomImageView mImageView;
     private RelativeLayout mLinearLayoutPhoto;
 
+    private boolean mIsZoomIn = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
         setView();
+        mDetector = new GestureDetectorCompat(getApplicationContext(), new MyGestureListener());
+
     }
 
     @Override
@@ -37,8 +46,7 @@ public class PhotoActivity extends BaseActivity {
         super.onResume();
         Intent intent = getIntent();
         String name = intent.getStringExtra(FILE_NAME);
-        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "MyCameraApp");
+        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCameraApp");
         ArrayList<File> files = getListFiles(imageDir);
         for (int i = 0; i < files.size(); i++) {
             if (files.get(i).getName().equals(name)) {
@@ -84,19 +92,51 @@ public class PhotoActivity extends BaseActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
+//        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
+//                RelativeLayout.LayoutParams.MATCH_PARENT,
+//                RelativeLayout.LayoutParams.MATCH_PARENT);
+//
+////        layoutParams.gravity = Gravity.CENTER;
+//        double h = getScreenHeight();
+//        double w = getScreenWidth();
+//
+//        double mAppRatio = w > h ? w / h : h / w;
+//
+//        layoutParams.height = (int) getScreenHeight();
+//        layoutParams.width = (int) (getScreenHeight() / mAppRatio);
+//
+//        mImageView.setLayoutParams(layoutParams);
+    }
 
-//        layoutParams.gravity = Gravity.CENTER;
-        double h = getScreenHeight();
-        double w = getScreenWidth();
 
-        double mAppRatio = w > h ? w / h : h / w;
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-        layoutParams.height = (int) getScreenHeight();
-        layoutParams.width = (int) (getScreenHeight() / mAppRatio);
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            final Animation zoomAnimation;
+            if (mIsZoomIn) {
+                zoomAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.zoom_out);
+                mIsZoomIn = false;
+            } else {
+                zoomAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.zoom_in);
+                mIsZoomIn = true;
+            }
+            mImageView.startAnimation(zoomAnimation);
+            return true;
+        }
 
-        mImageView.setLayoutParams(layoutParams);
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+    }
+
+
+    private GestureDetectorCompat mDetector;
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        return mDetector.onTouchEvent(e);
     }
 }

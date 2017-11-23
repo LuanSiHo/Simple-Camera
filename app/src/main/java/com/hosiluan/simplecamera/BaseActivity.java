@@ -39,7 +39,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             mTakepicPictureListener.takephoto();
-            Log.d("Luan","i'm here");
+            Log.d("Luan", "i'm here");
         }
     };
 
@@ -57,8 +57,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void checkCameraPermision() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
             }
@@ -66,11 +65,9 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void checkWriteStoragePermision() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        PERMISSION_WRITE_STORAGE);
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_STORAGE);
             }
         }
     }
@@ -79,8 +76,17 @@ public class BaseActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSION_READ_STORAGE);
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
+            }
+        }
+    }
+
+    protected void checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, PERMISSION_WRITE_STORAGE);
             }
         }
     }
@@ -123,21 +129,23 @@ public class BaseActivity extends AppCompatActivity {
             if (file.isDirectory()) {
                 inFiles.addAll(getListFiles(file));
             } else {
-                if(file.getName().endsWith(".jpg")){
+                if (file.getName().endsWith(".jpg")) {
                     inFiles.add(file);
                 }
             }
         }
         return inFiles;
     }
-    public void setPermissionListener(PermissionAcceptedListener mPermissionAcceptedListener){
+
+    public void setPermissionListener(PermissionAcceptedListener mPermissionAcceptedListener) {
         this.mPermissionAcceptedListener = mPermissionAcceptedListener;
     }
-    public  interface PermissionAcceptedListener{
+
+    public interface PermissionAcceptedListener {
         void onCameraAccepted();
     }
 
-    protected void setTakePictureListener(TakePictureListener mTakePictureListener){
+    protected void setTakePictureListener(TakePictureListener mTakePictureListener) {
         this.mTakepicPictureListener = mTakePictureListener;
     }
 

@@ -198,7 +198,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-        Log.d("Luan","surface create");
+        Log.d("Luan", "surface create");
         try {
             if (mCamera != null) {
                 mCamera.setPreviewDisplay(surfaceHolder);
@@ -229,9 +229,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        Log.d("Luan","surface change");
+        Log.d("Luan", "surface change");
 
-        if (mHolder.getSurface() == null){
+        if (mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
         }
@@ -239,7 +239,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         // stop preview before making changes
         try {
             mCamera.stopPreview();
-        } catch (Exception e){
+        } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
 
@@ -251,7 +251,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
-        } catch (Exception e){
+        } catch (Exception e) {
         }
 
 
@@ -259,7 +259,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        Log.d("Luan","surface destroy");
+        Log.d("Luan", "surface destroy");
 
 //        mCamera.stopPreview();
 //        mCamera.release();
@@ -324,8 +324,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         List<Camera.Size> sizes = params.getSupportedPictureSizes();
         Camera.Size size = sizes.get(0);
         for (int i = 0; i < sizes.size(); i++) {
-            if (sizes.get(i).width > size.width)
-                size = sizes.get(i);
+            if (sizes.get(i).width > size.width) size = sizes.get(i);
         }
 
         params.setPictureSize(size.width, size.height);
@@ -412,7 +411,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                 Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
                 Matrix matrix = new Matrix();
 
-                Log.d("Luan",MainActivity.sSavedCameraId + " save id");
                 switch (display.getRotation()) {
                     case Surface.ROTATION_0:
                         if (MainActivity.sSavedCameraId == 1) {
@@ -431,8 +429,11 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                         matrix.postRotate(180);
                         break;
                 }
-                bitmap = resize(bitmap,bitmap.getWidth(),bitmap.getHeight());
+                bitmap = resize(bitmap, bitmap.getWidth(), bitmap.getHeight());
 
+                if (MainActivity.sSavedCameraId == 1) {
+                    matrix.postScale(-1, 1);
+                }
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 //                bitmap = getScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight());
 
@@ -460,9 +461,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             int finalWidth = maxWidth;
             int finalHeight = maxHeight;
             if (ratioMax > ratioBitmap) {
-                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+                finalWidth = (int) ((float) maxHeight * ratioBitmap);
             } else {
-                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+                finalHeight = (int) ((float) maxWidth / ratioBitmap);
             }
             image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
             return image;
@@ -470,6 +471,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             return image;
         }
     }
+
     public void refreshCamera() {
         if (mHolder.getSurface() == null) {
             // preview surface does not exist
@@ -498,8 +500,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCameraApp");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
@@ -515,11 +516,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".jpg");
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
         } else if (type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_" + timeStamp + ".mp4");
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
         } else {
             return null;
         }

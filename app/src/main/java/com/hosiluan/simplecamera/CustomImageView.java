@@ -1,17 +1,27 @@
 package com.hosiluan.simplecamera;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.gesture.GestureOverlayView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.CornerPathEffect;
 import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -30,20 +40,23 @@ import static android.content.Context.WINDOW_SERVICE;
  */
 
 public class CustomImageView extends android.support.v7.widget.AppCompatImageView {
+
     public CustomImageView(Context context) {
         super(context);
     }
 
     public CustomImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
     }
 
     public CustomImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
     }
 
     public void loadImage(File file) {
-        new LoadImage().execute(file,this);
+        new LoadImage().execute(file, this);
     }
 
 
@@ -64,11 +77,10 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
 //                bitmap = getScaledBitmap(bitmap, ((ImageView) objects[1]).getWidth(),
 //                        ((ImageView) objects[1]).getHeight());
 
-                bitmap = resize(bitmap, ((ImageView) objects[1]).getWidth(),
-                        ((ImageView) objects[1]).getHeight());
+                bitmap = resize(bitmap, ((ImageView) objects[1]).getWidth(), ((ImageView) objects[1]).getHeight());
 
                 CachingBitmap cachingBitmap = CachingBitmap.getInstance();
-                cachingBitmap.addBitmapToMemoryCache(((File) objects[0]).getName(),bitmap);
+                cachingBitmap.addBitmapToMemoryCache(((File) objects[0]).getName(), bitmap);
 
                 publishProgress(((ImageView) objects[1]), bitmap);
 
@@ -88,8 +100,7 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
     public static Bitmap rotateImage(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
@@ -102,9 +113,9 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
             int finalWidth = maxWidth;
             int finalHeight = maxHeight;
             if (ratioMax > ratioBitmap) {
-                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+                finalWidth = (int) ((float) maxHeight * ratioBitmap);
             } else {
-                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+                finalHeight = (int) ((float) maxWidth / ratioBitmap);
             }
             image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
             return image;
@@ -155,4 +166,7 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         }
         return directory.getAbsolutePath();
     }
+
+
+
 }
