@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.hardware.Camera;
 import android.media.ExifInterface;
 import android.os.Environment;
@@ -99,6 +101,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 //        }
 
         mCamera = camera;
+        mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
+
 
         // supported preview sizes
 //        mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
@@ -198,10 +202,20 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-        Log.d("Luan", "surface create");
         try {
             if (mCamera != null) {
                 mCamera.setPreviewDisplay(surfaceHolder);
+                Camera.Parameters parameters = mCamera.getParameters();
+//                List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+//                parameters.setPictureSize(sizes.get(0).width, sizes.get(0).height); // mac dinh solution 0
+//                parameters.set("orientation", "portrait");
+//                //parameters.setPreviewSize(viewWidth, viewHeight);
+//                List<Camera.Size> size = parameters.getSupportedPreviewSizes();
+//                parameters.setPreviewSize(size.get(0).width, size.get(0).height);
+
+                Camera.Size size = determineBestSize(parameters.getSupportedPreviewSizes());
+                parameters.setPreviewSize(size.width,size.height);
+                mCamera.setParameters(parameters);
                 mCamera.startPreview();
             }
         } catch (IOException e) {
@@ -229,7 +243,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        Log.d("Luan", "surface change");
+
 
         if (mHolder.getSurface() == null) {
             // preview surface does not exist
@@ -248,8 +262,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
         // start preview with new settings
         try {
+
+            Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+            mCamera.setParameters(parameters);
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
+
+//            mCamera.startPreview();
 
         } catch (Exception e) {
         }
@@ -434,7 +454,15 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                 if (MainActivity.sSavedCameraId == 1) {
                     matrix.postScale(-1, 1);
                 }
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                if (display.getRotation() == Surface.ROTATION_270 ||
+                        display.getRotation() == Surface.ROTATION_90){
+//                    bitmap = Bitmap.createBitmap(bitmap, 300, 475, bitmap.getWidth() - 450 , bitmap.getHeight() - 950, matrix, true);
+
+                    bitmap = Bitmap.createBitmap(bitmap, bitmap.getWidth()/20, bitmap.getHeight()/6 , bitmap.getWidth() - bitmap.getWidth()/10 , bitmap.getHeight() - bitmap.getHeight()/3, matrix, true);
+
+                }else {
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() , bitmap.getHeight(), matrix, true);
+                }
 //                bitmap = getScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight());
 
                 FileOutputStream fos = new FileOutputStream(pictureFile);
@@ -446,10 +474,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             } catch (FileNotFoundException e) {
                 Log.d("Luan", "File not found: " + e.getMessage());
             }
-
             refreshCamera();
         }
     };
+
 
     private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
         if (maxHeight > 0 && maxWidth > 0) {
@@ -588,4 +616,84 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) h / w;
+
+        if (sizes == null)
+            return null;
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+                continue;
+
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+
+        return optimalSize;
+
+    }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+        setMeasuredDimension(width, height);
+
+        if (mSupportedPreviewSizes != null) {
+            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+        }
+    }
+
+
+    public static Camera.Size determineBestPreviewSize(Camera.Parameters parameters) {
+        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+        return determineBestSize(sizes);
+    }
+
+    public static Camera.Size determineBestPictureSize(Camera.Parameters parameters) {
+        List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+        return determineBestSize(sizes);
+    }
+
+    protected static Camera.Size determineBestSize(List<Camera.Size> sizes) {
+        Camera.Size bestSize = null;
+        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        long availableMemory = Runtime.getRuntime().maxMemory() - used;
+        for (Camera.Size currentSize : sizes) {
+            int newArea = currentSize.width * currentSize.height;
+            long neededMemory = newArea * 4 * 4; // newArea * 4 Bytes/pixel * 4 needed copies of the bitmap (for safety :) )
+            boolean isDesiredRatio = (currentSize.width / 4) == (currentSize.height / 3);
+            boolean isBetterSize = (bestSize == null || currentSize.width > bestSize.width);
+            boolean isSafe = neededMemory < availableMemory;
+            if (isDesiredRatio && isBetterSize && isSafe) {
+                bestSize = currentSize;
+            }
+        }
+        if (bestSize == null) {
+            return sizes.get(0);
+        }
+        return bestSize;
+    }
 }

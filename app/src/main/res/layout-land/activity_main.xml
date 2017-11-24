@@ -8,6 +8,7 @@
     tools:context="com.hosiluan.simplecamera.MainActivity">
 
     <FrameLayout
+        android:layout_toLeftOf="@+id/layout_take_photo"
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -98,7 +99,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:padding="26dp"
+        android:padding="20dp"
         android:layout_alignParentRight="true"
         android:id="@+id/layout_take_photo"
         android:layout_width="wrap_content"

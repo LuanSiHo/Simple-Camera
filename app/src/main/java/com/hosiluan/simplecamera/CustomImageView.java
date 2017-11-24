@@ -60,6 +60,7 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
     }
 
 
+
     class LoadImage extends AsyncTask<Object, Object, Bitmap> {
 
         @Override

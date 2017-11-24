@@ -15,10 +15,13 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -48,7 +51,6 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         checkPermission();
         setView();
         setEvent();
@@ -69,7 +71,6 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
         myAttribute += getTagString(ExifInterface.TAG_ORIENTATION, exif);
         myAttribute += getTagString(ExifInterface.TAG_WHITE_BALANCE, exif);
         Log.d("Luan", myAttribute);
-//        myTextView.setText(myAttribute);
     }
 
     private String getTagString(String tag, ExifInterface exif) {

@@ -9,14 +9,9 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.io.File;
@@ -24,13 +19,15 @@ import java.util.ArrayList;
 
 import static com.hosiluan.simplecamera.ListPhoToActivity.FILE_NAME;
 
-public class PhotoActivity extends BaseActivity {
-
-
+public class PhotoActivity extends BaseActivity implements GestureDetector.OnGestureListener {
+    float initialX;
+    float initialY;
     private CustomImageView mImageView;
     private RelativeLayout mLinearLayoutPhoto;
+    private int mCurrentImagePos = 0;
 
     private boolean mIsZoomIn = false;
+    ArrayList<File> mFileList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +35,6 @@ public class PhotoActivity extends BaseActivity {
         setContentView(R.layout.activity_photo);
         setView();
         mDetector = new GestureDetectorCompat(getApplicationContext(), new MyGestureListener());
-
     }
 
     @Override
@@ -47,10 +43,11 @@ public class PhotoActivity extends BaseActivity {
         Intent intent = getIntent();
         String name = intent.getStringExtra(FILE_NAME);
         File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCameraApp");
-        ArrayList<File> files = getListFiles(imageDir);
-        for (int i = 0; i < files.size(); i++) {
-            if (files.get(i).getName().equals(name)) {
-                mImageView.loadImage(files.get(i));
+        mFileList = getListFiles(imageDir);
+        for (int i = 0; i < mFileList.size(); i++) {
+            if (mFileList.get(i).getName().equals(name)) {
+                mImageView.loadImage(mFileList.get(i));
+                mCurrentImagePos = i;
             }
         }
     }
@@ -108,6 +105,40 @@ public class PhotoActivity extends BaseActivity {
 //        mImageView.setLayoutParams(layoutParams);
     }
 
+    @Override
+    public boolean onDown(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        Log.d("Luan", v + " / " + v1);
+        return true;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        Log.d("Luan", v + " / " + v1);
+        Log.d("Luan", "onFling: " + motionEvent.toString() + motionEvent1.toString());
+
+        return true;
+    }
+
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -137,6 +168,63 @@ public class PhotoActivity extends BaseActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        return mDetector.onTouchEvent(e);
+        int action = e.getActionMasked();
+
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                initialX = e.getX();
+                initialY = e.getY();
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                break;
+
+            case MotionEvent.ACTION_UP:
+                float finalX = e.getX();
+                float finalY = e.getY();
+
+
+                if (initialX < finalX) {
+                    Log.d("Luan", "Left to Right swipe performed");
+                    Log.d("Luan", mCurrentImagePos + " current");
+                    if (mCurrentImagePos > 0){
+                        mImageView.loadImage(mFileList.get(mCurrentImagePos - 1));
+                        mCurrentImagePos = mCurrentImagePos - 1;
+                    }
+                }
+
+                if (initialX > finalX) {
+                    Log.d("Luan", "Right to Left swipe performed");
+                    Log.d("Luan", mCurrentImagePos + " current");
+
+                    if (mCurrentImagePos < mFileList.size() - 1){
+                        mImageView.loadImage(mFileList.get(mCurrentImagePos + 1));
+                        mCurrentImagePos = mCurrentImagePos + 1;
+                    }
+                }
+
+                if (initialY < finalY) {
+//                    Log.d("Luan", "Up to Down swipe performed");
+                }
+
+                if (initialY > finalY) {
+//                    Log.d("Luan", "Down to Up swipe performed");
+                }
+
+                break;
+
+            case MotionEvent.ACTION_CANCEL:
+                Log.d("Luan", "Action was CANCEL");
+                break;
+
+            case MotionEvent.ACTION_OUTSIDE:
+                Log.d("Luan", "Movement occurred outside bounds of current screen element");
+                break;
+        }
+        return super.onTouchEvent(e);
+//        return mDetector.onTouchEvent(e);
     }
+
+
 }

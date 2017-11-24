@@ -36,7 +36,6 @@ public class ListPhoToActivity extends BaseActivity
         setView();
         setEvent();
         initToolbar();
-        Log.d("hello","ahihi");
     }
 
     private void setView() {
@@ -65,7 +64,6 @@ public class ListPhoToActivity extends BaseActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-
             mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 5));
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
