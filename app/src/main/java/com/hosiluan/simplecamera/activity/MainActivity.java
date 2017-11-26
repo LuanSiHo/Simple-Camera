@@ -1,4 +1,4 @@
-package com.hosiluan.simplecamera;
+package com.hosiluan.simplecamera.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -9,33 +9,25 @@ import android.media.ExifInterface;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.hosiluan.simplecamera.general.Common;
-
-import java.io.File;
-import java.io.IOException;
+import com.hosiluan.simplecamera.CameraView;
+import com.hosiluan.simplecamera.R;
+import com.hosiluan.simplecamera.general.Constant;
 
 public class MainActivity extends BaseActivity implements CameraView.TakePhotoListener,
         BaseActivity.PermissionAcceptedListener, BaseActivity.TakePictureListener{
 
     private Camera mCamera = null;
     private CameraView mCameraView = null;
-    int mCountDownTimerIndex = 4;
 
     public ImageView mLastestThumnailImageView;
     private Button mSwitchCameraButton;
@@ -45,6 +37,8 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     private int mCurrentCameraId = 0;
     public static int sSavedCameraId = -1;
     private SeekBar mSeekBar;
+    int mCountDownTimerIndex;
+
 
 
     @Override
@@ -219,12 +213,23 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
             @Override
             public void onClick(View view) {
 
+
+
                 if (mCameraView.isTimerOn()) {
-                    CountDownTimer countDownTimer = new CountDownTimer(4000, 1000) {
+                    mCountDownTimerIndex  = 3;
+                    CountDownTimer countDownTimer = new CountDownTimer(6000, 1000) {
                         @Override
                         public void onTick(long l) {
 
-                            mTimerTextView.setText(--mCountDownTimerIndex + "");
+                            mTimerTextView.setText(mCountDownTimerIndex + "");
+                            if (mCountDownTimerIndex < 0){
+                                Intent intent = new Intent();
+                                intent.setAction("com.luan.TAKE_PHOTO");
+                                sendBroadcast(intent);
+                                mTimerTextView.setText("");
+                            }
+                            mCountDownTimerIndex --;
+
                             Log.d("Luan", "tick " + mCountDownTimerIndex);
                         }
 
@@ -232,10 +237,6 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
                         public void onFinish() {
                             mTimerTextView.setText("");
                             Log.d("Luan", "finish");
-                            Intent intent = new Intent();
-                            intent.setAction("com.luan.TAKE_PHOTO");
-                            sendBroadcast(intent);
-
                         }
                     };
                     countDownTimer.start();
@@ -344,16 +345,16 @@ public class MainActivity extends BaseActivity implements CameraView.TakePhotoLi
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (sSavedCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            outState.putInt(Common.CURRENT_CAMERA_ID, 0);
+            outState.putInt(Constant.CURRENT_CAMERA_ID, 0);
         } else if (sSavedCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            outState.putInt(Common.CURRENT_CAMERA_ID, 1);
+            outState.putInt(Constant.CURRENT_CAMERA_ID, 1);
         }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        sSavedCameraId = savedInstanceState.getInt(Common.CURRENT_CAMERA_ID);
+        sSavedCameraId = savedInstanceState.getInt(Constant.CURRENT_CAMERA_ID);
     }
 
 }

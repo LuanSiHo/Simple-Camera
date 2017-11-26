@@ -1,4 +1,4 @@
-package com.hosiluan.simplecamera;
+package com.hosiluan.simplecamera.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,22 +12,32 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.GridView;
+
+import com.hosiluan.simplecamera.fragment.FragmentPhotoDeleteToolbar;
+import com.hosiluan.simplecamera.fragment.FragmentPhotoToolbarDefault;
+import com.hosiluan.simplecamera.R;
+import com.hosiluan.simplecamera.adapter.RecyclerViewAdapter;
+import com.hosiluan.simplecamera.general.Constant;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.hosiluan.simplecamera.general.Constant.FILE_NAME;
+import static com.hosiluan.simplecamera.general.Constant.LIST_PHOTO;
+
 public class ListPhoToActivity extends BaseActivity
         implements RecyclerViewAdapter.RecyclerViewAdapterListener,
         FragmentPhotoToolbarDefault.DefaultToolbarFragmentListener,
-        FragmentPhotoDeleteToolbar.DeleteToolbarFragmentListener {
+        FragmentPhotoDeleteToolbar.DeleteToolbarFragmentListener{
 
     ArrayList<File> mListPhoto;
-    GridView mListPhotoGridView;
 
     RecyclerView mRecyclerView;
     RecyclerViewAdapter mRecyclerViewAdapter;
-    public static final String FILE_NAME = "index to photo activity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +55,12 @@ public class ListPhoToActivity extends BaseActivity
         mRecyclerViewAdapter = new RecyclerViewAdapter(mListPhoto, getApplicationContext(), this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 5));
-        }else {
+        } else {
             mRecyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
         }
-        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "MyCameraApp");
+        File imageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MyCameraApp");
 
         ArrayList<File> mPhotos = getListFiles(imageDir);
         for (int i = 0; i < mPhotos.size(); i++) {
@@ -97,12 +106,13 @@ public class ListPhoToActivity extends BaseActivity
         Intent intent = new Intent(ListPhoToActivity.this, PhotoActivity.class);
         intent.putExtra(FILE_NAME, mListPhoto.get(position).getName());
         startActivity(intent);
+
     }
 
     @Override
     public void onItemLongClick() {
         FragmentPhotoDeleteToolbar fragmentPhotoDeleteToolbar = FragmentPhotoDeleteToolbar.create();
-            setFragment(fragmentPhotoDeleteToolbar,"");
+        setFragment(fragmentPhotoDeleteToolbar, "");
     }
 
     @Override
@@ -120,7 +130,7 @@ public class ListPhoToActivity extends BaseActivity
         mRecyclerViewAdapter.notifyDataSetChanged();
 
         FragmentPhotoToolbarDefault fragmentPhotoToolbarDefault = FragmentPhotoToolbarDefault.create();
-        setFragment(fragmentPhotoToolbarDefault,"");
+        setFragment(fragmentPhotoToolbarDefault, "");
     }
 
     @Override
@@ -128,39 +138,37 @@ public class ListPhoToActivity extends BaseActivity
 
         final AlertDialog alertDialog;
         final AlertDialog.Builder builder = new AlertDialog.Builder(ListPhoToActivity.this);
-        builder.setMessage("Bạn có muốn xóa những ảnh đã chọn")
-                .setTitle("Delete")
-                .setNegativeButton("Không", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+        builder.setMessage("Bạn có muốn xóa những ảnh đã chọn").setTitle("Delete").setNegativeButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
 
-                    }
-                })
-                .setPositiveButton("Có", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        }).setPositiveButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
 
 
-                        ArrayList<File> files = mRecyclerViewAdapter.getmSelectedList();
-                        for (int j = 0; j < files.size(); j ++){
-                            files.get(j).delete();
-                        }
-                        FragmentPhotoToolbarDefault fragmentPhotoToolbarDefault = FragmentPhotoToolbarDefault.create();
-                        setFragment(fragmentPhotoToolbarDefault,"");
+                ArrayList<File> files = mRecyclerViewAdapter.getmSelectedList();
+                for (int j = 0; j < files.size(); j++) {
+                    files.get(j).delete();
+                }
+                FragmentPhotoToolbarDefault fragmentPhotoToolbarDefault = FragmentPhotoToolbarDefault.create();
+                setFragment(fragmentPhotoToolbarDefault, "");
 
 
-                        for (int k = 0; k < files.size(); k ++){
-                            mListPhoto.remove(files.get(k));
-                        }
-                        mRecyclerViewAdapter.notifyDataSetChanged();
-                        mRecyclerViewAdapter.removeAllSelectedItem();
-                        mRecyclerViewAdapter.setUnHighLight(true);
-                        mRecyclerViewAdapter.setLongClicked(false);
+                for (int k = 0; k < files.size(); k++) {
+                    mListPhoto.remove(files.get(k));
+                }
+                mRecyclerViewAdapter.notifyDataSetChanged();
+                mRecyclerViewAdapter.removeAllSelectedItem();
+                mRecyclerViewAdapter.setUnHighLight(true);
+                mRecyclerViewAdapter.setLongClicked(false);
 
-                    }
-                });
+            }
+        });
         alertDialog = builder.create();
         alertDialog.show();
 
     }
+
 }

@@ -1,30 +1,24 @@
-package com.hosiluan.simplecamera;
+package com.hosiluan.simplecamera.adapter;
 
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.pm.FeatureInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.ImageView;
-import android.widget.Toast;
+
+import com.hosiluan.simplecamera.general.Common;
+import com.hosiluan.simplecamera.ultils.CachingBitmap;
+import com.hosiluan.simplecamera.custom.CustomImageView;
+import com.hosiluan.simplecamera.R;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Created by User on 11/9/2017.
@@ -40,7 +34,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private ArrayList<File> mSelectedList = new ArrayList<>();
     private ArrayList<String> highlightPosition = new ArrayList<>();
     private Boolean unHighLight = true;
-
 
 
     public ArrayList<File> getmSelectedList() {
@@ -129,6 +122,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         });
     }
 
+
     @Override
     public int getItemCount() {
         return mListPhoto.size();
@@ -162,24 +156,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    /**
-     * load image from internal storage
-     */
-    private Bitmap loadImageFromStorage(String path, String imageName) {
-        Bitmap bitmap = null;
-        try {
-            File f = new File(path, imageName);
-            bitmap = BitmapFactory.decodeStream(new FileInputStream(f));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
-
 
     public interface RecyclerViewAdapterListener {
         void onItemClick(int position);
-
         void onItemLongClick();
     }
 }

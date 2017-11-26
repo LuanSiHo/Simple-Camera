@@ -1,4 +1,4 @@
-package com.hosiluan.simplecamera;
+package com.hosiluan.simplecamera.activity;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -20,6 +20,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import static com.hosiluan.simplecamera.general.Constant.PERMISSION_CAMERA;
+import static com.hosiluan.simplecamera.general.Constant.PERMISSION_READ_STORAGE;
+import static com.hosiluan.simplecamera.general.Constant.PERMISSION_WRITE_STORAGE;
+
 /**
  * Created by Ho Si Luan on 11/7/2017.
  */
@@ -28,10 +32,8 @@ public class BaseActivity extends AppCompatActivity {
 
     PermissionAcceptedListener mPermissionAcceptedListener;
     TakePictureListener mTakepicPictureListener;
-    private static final int MY_PERMISSION_REQUEST = 1;
-    private static final int PERMISSION_CAMERA = 1;
-    private static final int PERMISSION_WRITE_STORAGE = 2;
-    private static final int PERMISSION_READ_STORAGE = 3;
+
+
 
 
     IntentFilter intentFilter = new IntentFilter("com.luan.TAKE_PHOTO");
@@ -39,7 +41,6 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             mTakepicPictureListener.takephoto();
-            Log.d("Luan", "i'm here");
         }
     };
 
@@ -86,7 +87,9 @@ public class BaseActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, PERMISSION_WRITE_STORAGE);
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_WRITE_STORAGE);
             }
         }
     }
@@ -122,6 +125,11 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * get List photo from external storage
+     * @param parentDir
+     * @return
+     */
     protected ArrayList<File> getListFiles(File parentDir) {
         ArrayList<File> inFiles = new ArrayList<>();
         File[] files = parentDir.listFiles();
@@ -135,6 +143,17 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
         return inFiles;
+    }
+
+    protected File getFileByName(File parentDir, String fileName){
+
+        File[] files = parentDir.listFiles();
+        for (File file : files){
+            if (file.getName().equals(fileName)){
+                return file;
+            }
+        }
+        return null;
     }
 
     public void setPermissionListener(PermissionAcceptedListener mPermissionAcceptedListener) {

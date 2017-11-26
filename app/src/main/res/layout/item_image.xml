@@ -6,7 +6,7 @@
     android:padding="@dimen/photo_padding"
     android:gravity="center">
 
-    <com.hosiluan.simplecamera.CustomImageView
+    <com.hosiluan.simplecamera.custom.CustomImageView
         android:layout_gravity="center"
         android:id="@+id/img_image"
         android:layout_width="@dimen/photo_size"

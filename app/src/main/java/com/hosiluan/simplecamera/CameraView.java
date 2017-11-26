@@ -1,33 +1,24 @@
 package com.hosiluan.simplecamera;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.hardware.Camera;
-import android.media.ExifInterface;
 import android.os.Environment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
+import com.hosiluan.simplecamera.activity.MainActivity;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.Policy;
-import java.security.acl.LastOwnerException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -422,11 +413,14 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                 Log.d("Luan", "Error creating media file, check storage permissions: ");
                 return;
             }
-            String path = pictureFile.getAbsolutePath();
 
             try {
 
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.RGB_565;
+                options.inSampleSize = 2;
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length,options);
 
                 Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
                 Matrix matrix = new Matrix();
@@ -449,25 +443,22 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
                         matrix.postRotate(180);
                         break;
                 }
-                bitmap = resize(bitmap, bitmap.getWidth(), bitmap.getHeight());
+//                bitmap = resize(bitmap, bitmap.getWidth(), bitmap.getHeight());
 
                 if (MainActivity.sSavedCameraId == 1) {
                     matrix.postScale(-1, 1);
                 }
                 if (display.getRotation() == Surface.ROTATION_270 ||
                         display.getRotation() == Surface.ROTATION_90){
-//                    bitmap = Bitmap.createBitmap(bitmap, 300, 475, bitmap.getWidth() - 450 , bitmap.getHeight() - 950, matrix, true);
 
                     bitmap = Bitmap.createBitmap(bitmap, bitmap.getWidth()/20, bitmap.getHeight()/6 , bitmap.getWidth() - bitmap.getWidth()/10 , bitmap.getHeight() - bitmap.getHeight()/3, matrix, true);
 
                 }else {
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() , bitmap.getHeight(), matrix, true);
                 }
-//                bitmap = getScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight());
 
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-
 
                 mTakePhotoListener.setBitmap(bitmap);
 
@@ -524,6 +515,11 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
+    /**
+     * create file to save bitmap
+     * @param type
+     * @return
+     */
     private static File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.

@@ -1,7 +1,6 @@
-package com.hosiluan.simplecamera;
+package com.hosiluan.simplecamera.ultils;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.util.LruCache;
 
 /**
@@ -12,13 +11,13 @@ public class CachingBitmap {
 
     private LruCache<String, Bitmap> mMemoryCache;
 
-    private static CachingBitmap cache;
+    private static CachingBitmap sCache;
 
     public static CachingBitmap getInstance() {
-        if (cache == null) {
-            cache = new CachingBitmap();
+        if (sCache == null) {
+            sCache = new CachingBitmap();
         }
-        return cache;
+        return sCache;
     }
 
     public CachingBitmap() {
@@ -28,13 +27,13 @@ public class CachingBitmap {
     private void initializeCache() {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
-        final int cacheSize = maxMemory / 3;
+        final int cacheSize = maxMemory / 8;
 
-        System.out.println("cache size = " + cacheSize);
+        System.out.println("sCache size = " + cacheSize);
 
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
             protected int sizeOf(String key, Bitmap value) {
-                // The cache size will be measured in kilobytes rather than number of items.
+                // The sCache size will be measured in kilobytes rather than number of items.
 
                 int bitmapByteCount = value.getRowBytes() * value.getHeight();
 

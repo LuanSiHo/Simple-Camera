@@ -10,18 +10,11 @@
     android:gravity="center"
     tools:context="com.hosiluan.simplecamera.activity.PhotoActivity">
 
-    <!--<com.hosiluan.simplecamera.custom.CustomImageView-->
-        <!--android:id="@+id/img_image"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:src="@mipmap/ic_launcher"/>-->
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_photo"
+    <com.hosiluan.simplecamera.custom.CustomImageView
+        android:id="@+id/img_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:src="@mipmap/ic_launcher"/>
 
 </RelativeLayout>

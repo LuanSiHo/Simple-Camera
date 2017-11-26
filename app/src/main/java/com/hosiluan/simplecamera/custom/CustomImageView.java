@@ -1,31 +1,20 @@
-package com.hosiluan.simplecamera;
+package com.hosiluan.simplecamera.custom;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.gesture.GestureOverlayView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.CornerPathEffect;
 import android.graphics.Matrix;
-import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.Surface;
-import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.hosiluan.simplecamera.general.Constant;
+import com.hosiluan.simplecamera.ultils.CachingBitmap;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,33 +22,37 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static android.content.Context.WINDOW_SERVICE;
-
 /**
  * Created by User on 11/9/2017.
  */
 
 public class CustomImageView extends android.support.v7.widget.AppCompatImageView {
+    public  LoadImage mLoadImage;
+    Bitmap bitmap = null;
 
     public CustomImageView(Context context) {
         super(context);
+        // Set the gesture detector as the double tap
+        // listener.
     }
 
     public CustomImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
     }
 
     public CustomImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
     }
 
-    public void loadImage(File file) {
-        new LoadImage().execute(file, this);
+    public void loadImage(final File file) {
+
+        new LoadImage().execute(file,this);
     }
 
 
+    private void init(){
+
+    }
 
     class LoadImage extends AsyncTask<Object, Object, Bitmap> {
 
@@ -71,19 +64,22 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
 
         @Override
         protected Bitmap doInBackground(Object... objects) {
-            Bitmap bitmap = null;
+
             try {
-                bitmap = BitmapFactory.decodeStream(new FileInputStream((File) objects[0]));
-
-//                bitmap = getScaledBitmap(bitmap, ((ImageView) objects[1]).getWidth(),
-//                        ((ImageView) objects[1]).getHeight());
-
-                bitmap = resize(bitmap, ((ImageView) objects[1]).getWidth(), ((ImageView) objects[1]).getHeight());
-
                 CachingBitmap cachingBitmap = CachingBitmap.getInstance();
+
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.RGB_565;
+                options.inSampleSize = 2;
+
+                bitmap = BitmapFactory.decodeStream(new FileInputStream((File) objects[0]), null, options);
+
+//                bitmap = resize(bitmap, ((ImageView) objects[1]).getWidth(), ((ImageView) objects[1]).getHeight());
                 cachingBitmap.addBitmapToMemoryCache(((File) objects[0]).getName(), bitmap);
 
                 publishProgress(((ImageView) objects[1]), bitmap);
+
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -98,16 +94,10 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
     }
 
 
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-    }
-
-    private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
+    private static Bitmap resize(Bitmap bitmap, int maxWidth, int maxHeight) {
         if (maxHeight > 0 && maxWidth > 0) {
-            int width = image.getWidth();
-            int height = image.getHeight();
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
             float ratioBitmap = (float) width / (float) height;
             float ratioMax = (float) maxWidth / (float) maxHeight;
 
@@ -118,10 +108,10 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
             } else {
                 finalHeight = (int) ((float) maxWidth / ratioBitmap);
             }
-            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
-            return image;
+            bitmap = Bitmap.createScaledBitmap(bitmap, finalWidth, finalHeight, true);
+            return bitmap;
         } else {
-            return image;
+            return bitmap;
         }
     }
 
@@ -167,7 +157,6 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         }
         return directory.getAbsolutePath();
     }
-
 
 
 }
